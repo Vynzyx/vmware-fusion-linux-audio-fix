@@ -75,7 +75,8 @@ Before the fix the same measurement gives 13 to 14 tear-downs per 20 seconds.
   to be Ubuntu specific, but that is all it was tested on.
 - Host-side `.vmx` tweaks people recommend for this (`sound.backendType`,
   `sound.maxLength`, `sound.numBuffers`, `sound.bufferTime`, output-only
-  `sound.fileName`) all made things worse here. See `docs/diagnosis.md`.
+  `sound.fileName`) either silence the output or add nothing. Stock host sound
+  settings are the ones that work.
 
 ## Uninstall
 
