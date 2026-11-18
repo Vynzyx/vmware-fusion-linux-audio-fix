@@ -2,12 +2,20 @@
 # Guest-side audio fix for Linux on VMware Fusion (Apple Silicon).
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+usage: ./install.sh [--with-mic]
+
+  --with-mic   keep the guest microphone usable (default: capture hidden)
+EOF
+}
+
 WITH_MIC=0
 for arg in "$@"; do
   case $arg in
     --with-mic) WITH_MIC=1 ;;
-    -h|--help) sed -n '2,3p' "$0"; exit 0 ;;
-    *) echo "unknown option: $arg" >&2; exit 1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "unknown option: $arg" >&2; usage >&2; exit 1 ;;
   esac
 done
 
