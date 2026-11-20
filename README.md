@@ -55,18 +55,20 @@ Before the fix the same measurement gives 13 to 14 tear-downs per 20 seconds.
 ## What it changes
 
 - `~/.config/wireplumber/wireplumber.conf.d/51-vmware-hda.conf`
-  `api.alsa.disable-tsched`, `disable-batch`, 4096 frame periods, 16384 frame
-  headroom on the emulated card.
+  `api.alsa.disable-tsched`, `disable-batch`, 2048 frame periods, 32768 frame
+  headroom on the emulated card's **output only**. Capture keeps default
+  timer scheduling because period wakeups never fire on the emulated input
+  path.
 - `~/.config/pipewire/pipewire.conf.d/20-clock.conf`
-  clock quantum 4096, max quantum 8192.
+  clock quantum 2048, max quantum 8192.
 - `~/.config/systemd/user/*.service.d/rt.conf` with `LimitRTPRIO=95`,
-  `LimitNICE=-11`, `LimitMEMLOCK=infinity`.
+  `LimitNICE=20`, `LimitMEMLOCK=infinity`.
 - `/etc/security/limits.d/95-pipewire.conf` and membership of the `audio`
   group.
 
 ## Caveats
 
-- Adds latency. Around 85 to 170 ms, fine for video and music, noticeable if
+- Adds latency. Around 40 to 85 ms, fine for video and music, noticeable if
   you monitor live input.
 - Disables the guest microphone unless `--with-mic` is passed.
 - Written against PipeWire 1.6 and WirePlumber 0.5. Distros with PulseAudio
@@ -77,6 +79,12 @@ Before the fix the same measurement gives 13 to 14 tear-downs per 20 seconds.
   `sound.maxLength`, `sound.numBuffers`, `sound.bufferTime`, output-only
   `sound.fileName`) either silence the output or add nothing. Stock host sound
   settings are the ones that work.
+- Microphone capture additionally requires macOS **System Settings → Privacy
+  & Security → Microphone → VMware Fusion** to be enabled on the host, and the
+  guest codec's `Capture` control unmuted at 100% with `Mic Boost` at 0.
+- Pinning the VM to a specific USB headset via `sound.fileName` reintroduced
+  the dropouts in testing. Leave `sound.autodetect` enabled and let the host
+  default device drive it.
 
 ## Uninstall
 
